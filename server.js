@@ -1,37 +1,36 @@
 // Modules
-var express = require('express');
-var app = express();
-var http = require('http');
-var bodyParser = require('body-parser');
+const express = require('express')
+const helmet = require('helmet')
+const morgan = require('morgan')
+const app = express()
+const http = require('http')
+const path = require('path')
 
 // Set server port
-var port = process.env.PORT || 8282;
+const port = 8282
 
 // Create server
-var server = http.createServer(app).listen(port);
-console.log("Server running on http://localhost:" + port);
+const server = http.createServer(app).listen(port)
+console.log('Server running on http://localhost:' + port)
 
 // Require and configure socket.io
-var io = require('socket.io')(server);
+const io = require('socket.io')(server)
+app.use(morgan('dev'))
+app.use(helmet())
 
-// Parse application/json
-app.use(bodyParser.json());
+app.get('/favicon.ico', function (req, res) {
+  res.sendStatus(200)
+})
 
-// Parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: true }));
+app.get('/', function (req, res) {
+  res.sendFile(path.join(__dirname, 'views', 'index.html'))
+})
 
 // Serve up static assests
-app.use(express.static(__dirname + '/public'));
-
-// Set pug as view engine
-app.set('view engine', 'pug');
-//app.set('views', __dirname + '/public/views');
-
-// Routes
-require('./app/routes')(app);
+app.use(express.static(path.join(__dirname, 'public')))
 
 // IO
-require('./app/io')(io);
+require('./app/io')(io)
 
 // Expose app
-exports = module.exports = app;
+exports = module.exports = app

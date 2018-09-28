@@ -1,1 +1,1 @@
-var svc = angular.module('services', []);
+var svc = angular.module('services', [])
