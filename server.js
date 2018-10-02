@@ -18,10 +18,6 @@ const io = require('socket.io')(server)
 app.use(morgan('dev'))
 app.use(helmet())
 
-app.get('/favicon.ico', function (req, res) {
-  res.sendStatus(200)
-})
-
 app.get('/', function (req, res) {
   res.sendFile(path.join(__dirname, 'views', 'index.html'))
 })

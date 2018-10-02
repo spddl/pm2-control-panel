@@ -1,7 +1,6 @@
 body {
   font-family: 'Roboto', sans-serif;
   margin: 0px auto;
-  padding: 5px;
 }
 
 button {
@@ -13,8 +12,38 @@ button {
 }
 
 .sortorder:after {
-    content: '\25b2';
+  content: '\25b2';
 }
 .sortorder.reverse:after {
-    content: '\25bc';
+  content: '\25bc';
+}
+
+.success { /* Success Badge */
+  background-color: #32d296 !important;
+  color: #fff !important;
+}
+.danger { /* Danger Badge */
+  background-color: #f0506e !important;
+  color: #fff !important;
+}
+
+.uk-light .uk-notification-message {
+  background-color: #222 !important;
+}
+
+[animate-on-change] {
+  transition: all 1s;
+  -webkit-transition: all 1s;
+}
+[animate-on-change].changedBigger {
+  text-shadow: #32d296 0 0 5px;
+  color: #32d296;
+  transition: none;
+  -webkit-transition: none;
+}
+[animate-on-change].changedSmaller {
+  text-shadow: #f0506e 0 0 5px;
+  color: #f0506e;
+  transition: none;
+  -webkit-transition: none;
 }

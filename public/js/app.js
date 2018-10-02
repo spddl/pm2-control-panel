@@ -6,13 +6,9 @@ var app = angular.module('app', [
   'yaru22.angular-timeago'
 ])
 
-app.config(function (timeAgoSettings) {
-  timeAgoSettings.allowFuture = true
-  timeAgoSettings.overrideLang = 'de_DE'
-  timeAgoSettings.strings['de_DE'].prefixAgo = 'seit'
-})
-
 angular.module('yaru22.angular-timeago').config(function (timeAgoSettings) {
+  timeAgoSettings.overrideLang = 'de_DE'
+  timeAgoSettings.breakpoints.hoursToDay = 49 // in hours
   timeAgoSettings.strings['de_DE'] = {
     prefixAgo: 'vor',
     prefixFromNow: 'in',

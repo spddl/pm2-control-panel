@@ -1,13 +1,28 @@
-var ctrl = angular.module('controllers', ['directives'])
+var ctrl = angular.module('controllers', ['directives', 'ngStorage'])
+
 var socket = io()
 
-ctrl.controller('indexController', function ($scope, $interval) {
-  $scope.propertyName = 'pm2_env.pm_uptime'
-  $scope.reverse = true
+ctrl.controller('indexController', function ($scope, $localStorage) {
+  $scope.optionsDefault = {
+    dark: false,
+    propertyName: 'pm2_env.pm_uptime',
+    reverse: false,
+    profi: false
+  }
+
+  $scope.options = $localStorage.$default($scope.optionsDefault)
+
+  $scope.darkcolor = function () {
+    if ($scope.options.dark) {
+      return '#222'
+    } else {
+      return '#fff'
+    }
+  }
 
   $scope.sortBy = function (propertyName) {
-    $scope.reverse = ($scope.propertyName === propertyName) ? !$scope.reverse : false
-    $scope.propertyName = propertyName
+    $scope.options.reverse = ($scope.options.propertyName === propertyName) ? !$scope.options.reverse : false
+    $scope.options.propertyName = propertyName
   }
 
   socket.on('error', function (error) {
@@ -24,26 +39,34 @@ ctrl.controller('indexController', function ($scope, $interval) {
     $scope.applist = appList
     $scope.$evalAsync()
 
-    $scope.startApp = function (name) {
-      socket.emit('startagain-app', name)
-      UIkit.notification("<span uk-icon='icon: play-circle'></span> Starte: " + name)
-    }
-    $scope.restartApp = function (name) {
-      socket.emit('restart-app', name)
-      UIkit.notification("<span uk-icon='icon: refresh'></span> Starte neu: " + name)
-    }
-    $scope.delApp = function (name) {
-      var confdel = confirm('Are you sure you want to delete this app?')
-      if (confdel) {
-        socket.emit('del-app', name)
-        UIkit.notification("<span uk-icon='icon: trash'></span> lösche: " + name)
-      }
-    }
-    $scope.stopApp = function (name) {
-      socket.emit('stop-app', name)
-      UIkit.notification("<span uk-icon='icon: lifesaver'></span> Stop: " + name)
-    }
+    UIkit.notification({
+      message: 'Update',
+      status: 'success',
+      pos: 'bottom-right',
+      timeout: 500
+    })
   })
+
+  $scope.startApp = function (name) {
+    socket.emit('startagain-app', name)
+    UIkit.notification("<span uk-icon='icon: play-circle'></span> Starte: " + name)
+  }
+  $scope.restartApp = function (name) {
+    socket.emit('restart-app', name)
+    UIkit.notification("<span uk-icon='icon: refresh'></span> Starte neu: " + name)
+  }
+  $scope.delApp = function (name) {
+    var confdel = confirm('Are you sure you want to delete this app?')
+    if (confdel) {
+      socket.emit('del-app', name)
+      UIkit.notification("<span uk-icon='icon: trash'></span> lösche: " + name)
+    }
+  }
+  $scope.stopApp = function (name) {
+    socket.emit('stop-app', name)
+    UIkit.notification("<span uk-icon='icon: lifesaver'></span> Stop: " + name)
+  }
+
   /* $('#initapp').click(function() {
     var path = $('#newfilepath').val()
     var name = $('#newappname').val()

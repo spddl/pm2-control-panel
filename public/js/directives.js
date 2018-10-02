@@ -27,3 +27,23 @@ dct.directive('ctrlc', function () {
     })
   }
 })
+
+dct.directive('animateOnChange', function ($timeout) { // https://stackoverflow.com/a/30037095
+  return function (scope, element, attr) {
+    scope.$watch(attr.animateOnChange, function (nv, ov) {
+      if (nv !== ov) {
+        if (nv < ov) {
+          element.addClass('changedBigger')
+          $timeout(function () {
+            element.removeClass('changedBigger')
+          }, 1000)
+        } else {
+          element.addClass('changedSmaller')
+          $timeout(function () {
+            element.removeClass('changedSmaller')
+          }, 1000)
+        }
+      }
+    })
+  }
+})

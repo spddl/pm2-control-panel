@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="app" ng-controller="indexController" ng-style="options.dark && {'background':'rgb(34, 34, 34)'}">
+<head>
+    <title>Control Panel</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto" />
+    <link rel="stylesheet" href="uikit/uikit.min.css" />
+    <link rel="stylesheet" href="styles/styles.css" />
+    <link href="data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQEAYAAABPYyMiAAAABmJLR0T///////8JWPfcAAAACXBIWXMAAABIAAAASABGyWs+AAAAF0lEQVRIx2NgGAWjYBSMglEwCkbBSAcACBAAAeaR9cIAAAAASUVORK5CYII=" rel="icon" type="image/x-icon" />
+    <meta name="theme-color" content="{{ options.dark ? '#222' : '#fff' }}" >
+</head>
+<!-- <meta name="theme-color" content="#db5945"> -->
+<body ng-class="{'uk-light': options.dark, 'uk-dark': !options.dark }">
+    <nav class="uk-navbar-container uk-navbar-transparent" ng-class="{'uk-background-default': !options.dark, 'uk-background-secondary': options.dark }" uk-navbar  style="position: relative; z-index: 980;">
+        <div class="uk-navbar-left">
+            <ul class="uk-navbar-nav">
+                <li>
+                    <a class="uk-navbar-toggle" href="#" uk-toggle="target: #sidemenu">
+                        <span uk-navbar-toggle-icon></span> <span class="uk-margin-small-left uk-visible@l">Menu</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="uk-navbar-center">
+            <a class="uk-navbar-item uk-logo" href="#">
+                <h1 class="uk-heading-line uk-heading-primary uk-text-primary uk-visible@l"><span>Control Panel</span></h1>
+                <span class="uk-hidden@l">Control Panel</span>
+            </a>
+        </div>
+    </nav>
+    <div id="sidemenu" uk-offcanvas="mode: none; overlay: true">
+        <div class="uk-offcanvas-bar ng-cloak">
+            <ul class="uk-nav uk-nav-default">
+                <li class="uk-active"><a href="#">Profi</a></li>
+                <li class="uk-parent">
+                    <!-- <div class="uk-button-group">
+                        <button class="uk-button uk-button-primary" ng-click="options.profi = true">An</button>
+                        <button class="uk-button uk-button-primary" ng-click="options.profi = false">Aus</button>
+                    </div> -->
+                    <div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+                        <label><input class="uk-checkbox" type="checkbox" ng-model="options.profi"> Profi</label>
+                    </div>
+                </li>
+                <li class="uk-nav-divider"></li>
+                <li class="uk-active"><a href="#">Dunkel Modus</a></li>
+                <li class="uk-parent">
+                    <!-- <div class="uk-button-group">
+                        <button class="uk-button uk-button-primary" ng-click="options.dark = true">An</button>
+                        <button class="uk-button uk-button-primary" ng-click="options.dark = false">Aus</button>
+                    </div> -->
+                    <div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+                        <label><input class="uk-checkbox" type="checkbox" ng-model="options.dark"> Dark</label>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <br/>
+    <div class="uk-overflow-auto">
+        <table class="uk-table uk-table-divider uk-table-striped uk-table-hover" id="appsTable">
+            <thead>
+                <!-- uk-table-responsive  -->
+                <tr>
+                    <th class="uk-text-primary link" ng-click="sortBy('name')">Name <span class="sortorder" ng-show="options.propertyName === 'name'" ng-class="{reverse: options.reverse}"></span></th>
+                    <th class="uk-text-primary">Status</th>
+                    <th class="uk-text-primary">PID</th>
+                    <th class="uk-text-primary link" ng-click="sortBy('pm2_env.restart_time')">Restarts <span class="sortorder" ng-show="options.propertyName === 'pm2_env.restart_time'" ng-class="{reverse: options.reverse}"></span></th>
+                    <th class="uk-text-primary link" ng-click="sortBy('monit.memory')">Memory <span class="sortorder" ng-show="options.propertyName === 'monit.memory'" ng-class="{reverse: options.reverse}"></span></th>
+                    <th class="uk-text-primary link" ng-click="sortBy('monit.cpu')">CPU <span class="sortorder" ng-show="options.propertyName === 'monit.cpu'" ng-class="{reverse: options.reverse}"></span></th>
+                    <th class="uk-text-primary link" ng-click="sortBy('pm2_env.pm_uptime')">Uptime <span class="sortorder" ng-show="options.propertyName === 'pm2_env.pm_uptime'" ng-class="{reverse: options.reverse}"></span></th>
+                    <th class="uk-text-primary">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="app in applist | orderBy : options.propertyName : options.reverse track by $index">
+                    <td class="uk-text-nowrap"><span ng-bind="app.name"></span> <span ng-if="app.pm2_env.exec_mode === 'cluster_mode'" class="uk-label">Cluster</span></td>
+                    <!-- <td><div class="uk-margin"><input class="uk-input uk-form-blank uk-form-width-medium uk-form-small" type="text" placeholder="{{app.name}}"> <span ng-if="app.pm2_env.exec_mode === 'cluster_mode'" class="uk-label">Cluster</span></div></td> -->
+                    <td class="uk-text-nowrap"><span class="uk-label" ng-class="app.pm2_env.status === 'online' ? 'success' : 'danger'" ng-bind="app.pm2_env.status"></span> <small title="Loop delay">{{ app.pm2_env.axm_monitor['Loop delay'].value }}</small></td>
+                    <td class="uk-text-nowrap" ng-bind="app.pid"></td>
+                    <td class="uk-text-nowrap" animate-on-change="app.pm2_env.restart_time" ng-bind="app.pm2_env.restart_time"></td>
+                    <td class="uk-text-nowrap" animate-on-change="app.monit.memory" ng-bind="(app.monit.memory / 1024 / 1024).toFixed(2) + ' MB'"></td>
+                    <td class="uk-text-nowrap" animate-on-change="app.monit.cpu" ng-bind="app.monit.cpu.toFixed(1) + ' %'"></td>
+                    <td class="uk-text-nowrap"><time-ago title="{{app.pm2_env.pm_uptime | date:'dd.MM.yyyy HH:mm:ss.sss' }}" from-time="{{ app.pm2_env.pm_uptime }}"></time-ago></td>
+                    <td class="uk-text-nowrap">
+                        <ul class="uk-iconnav">
+                            <li><a ng-click="restartApp(app.name)" title="Neustart" href="" uk-icon="icon: refresh"></a></li>
+                            <li ng-show="options.profi"><a ng-click="startApp(app.name)" title="Starten" href="" uk-icon="icon: play-circle"></a></li>
+                            <li ng-show="options.profi"><a ng-click="stopApp(app.name)" title="Stoppen" href="" uk-icon="icon: lifesaver"></a></li>
+                            <li ng-show="options.profi"><a ng-click="delApp(app.name)" title="Löschen" href="" uk-icon="icon: trash"></a></li>
+                        </ul>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <!-- <div uk-modal="uk-modal" id="startmodal">
+        <div class="uk-modal-dialog uk-modal-body">
+            <h3 class="uk-modal-title">Start App</h3>
+            <input class="uk-input" type="text" placeholder="App name..." id="newappname" />
+            <input class="uk-input" type="text" placeholder="Path to file..." id="newfilepath" />
+            <p class="uk-text-right">
+                <button class="uk-button uk-button-default uk-modal-close">Cancel</button>
+                <button class="uk-button uk-button-primary" id="initapp">Add</button>
+            </p>
+        </div>
+    </div> -->
+</body>
+<script src="js/angular.min.js"></script>
+<script src="js/angular-timeago-core.min.js"></script> <!-- https://github.com/yaru22/angular-timeago -->
+<script src="js/ngStorage.min.js"></script> <!-- 0.3.11 github.com/gsklee/ngStorage -->
+<script src="socket.io/socket.io.js"></script>
+<script src="uikit/uikit.min.js"></script>
+<script src="uikit/uikit-icons.min.js"></script>
+<script src="js/directives.js"></script>
+<script src="js/services.js"></script>
+<script src="js/controllers.js"></script>
+<script src="js/app.js"></script>
+</html>
