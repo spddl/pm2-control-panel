@@ -1,5 +1,7 @@
 const pm2 = require('pm2')
 
+let cacheApps = {}
+let interval = 5000
 module.exports = function (io) {
   function getApps (io) {
     try {
@@ -15,6 +17,7 @@ module.exports = function (io) {
               console.warn(err)
             } else {
               io.emit('list-apps', applist)
+              cacheApps = applist
             }
             pm2.disconnect()
           })
@@ -27,15 +30,15 @@ module.exports = function (io) {
 
   setInterval(() => {
     throttle(getApps(io))
-  }, 5000)
+  }, interval)
 
   io.on('connection', function (client) {
     console.log('Client connected', new Date())
-    throttle(getApps(io))
+    client.emit('list-apps', cacheApps)
 
-    client.on('get-apps', function () {
-      throttle(getApps(io))
-    })
+    // client.on('get-apps', function () {
+    //   throttle(getApps(io))
+    // })
 
     client.on('start-app', function (app) {
       console.log('client.on(start-app)')

@@ -6,8 +6,9 @@ ctrl.controller('indexController', function ($scope, $localStorage) {
   $scope.optionsDefault = {
     dark: false,
     propertyName: 'pm2_env.pm_uptime',
-    reverse: false,
-    profi: false
+    reverse: true,
+    profi: false,
+    popup: true
   }
 
   $scope.options = $localStorage.$default($scope.optionsDefault)
@@ -39,12 +40,14 @@ ctrl.controller('indexController', function ($scope, $localStorage) {
     $scope.applist = appList
     $scope.$evalAsync()
 
-    UIkit.notification({
-      message: 'Update',
-      status: 'success',
-      pos: 'bottom-right',
-      timeout: 500
-    })
+    if ($scope.options.popup) {
+      UIkit.notification({
+        message: 'Update',
+        status: 'success',
+        pos: 'bottom-right',
+        timeout: 500
+      })
+    }
   })
 
   $scope.startApp = function (name) {
@@ -67,7 +70,7 @@ ctrl.controller('indexController', function ($scope, $localStorage) {
     UIkit.notification("<span uk-icon='icon: lifesaver'></span> Stop: " + name)
   }
 
-  /* $('#initapp').click(function() {
+  /* $('#initapp').click(function () {
     var path = $('#newfilepath').val()
     var name = $('#newappname').val()
     if (path == "" || name == "") {
